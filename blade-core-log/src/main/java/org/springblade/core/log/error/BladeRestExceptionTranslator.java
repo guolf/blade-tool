@@ -28,6 +28,7 @@ import org.springblade.core.tool.utils.WebUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
@@ -148,6 +149,13 @@ public class BladeRestExceptionTranslator {
 	public R handleError(SecureException e) {
 		log.error("认证异常", e);
 		return R.fail(e.getResultCode(), e.getMessage());
+	}
+
+	@ExceptionHandler(DataAccessException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public R handleSQLError(DataAccessException e) {
+		log.error("数据库异常", e);
+		return R.fail(ResultCode.INTERNAL_SERVER_ERROR, "服务器异常，请稍后再试");
 	}
 
 	@ExceptionHandler(Throwable.class)
